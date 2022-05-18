@@ -93,7 +93,7 @@ if (argv.bsmode) {
         res.redirect("/mainview/framework.html");
     });
 } else {
-    const { app, BrowserWindow, ipcMain, nativeTheme } = require("electron");
+    const { app,  BrowserView, BrowserWindow, ipcMain, nativeTheme } = require("electron");
     const os = require("os");
     const platform = os.platform();
     const { Worker} = require('worker_threads');
@@ -197,6 +197,11 @@ if (argv.bsmode) {
         // Open the DevTools.
         // mainWindow.webContents.openDevTools()
         require("@electron/remote/main").enable(mainWindow.webContents);
+
+        const view = new BrowserView()
+        mainWindow.setBrowserView(view)
+  view.setBounds({ x: 50, y: 50, width: 300, height: 300 })
+  view.webContents.loadURL('https://electronjs.org')
 
         // Emitted when the window is closed.
         mainWindow.on("closed", function () {
