@@ -63,12 +63,10 @@ var mixamorig = {
     },
 };
 
-function domBoom(target,onfinish) {
+function domBoom(target, onfinish) {
     target.style.animation = "shake 800ms ease-in-out";
-    var targetBoundingClientRectX =
-        target.getBoundingClientRect().x;
-    var targetBoundingClientRectY =
-        target.getBoundingClientRect().y;
+    var targetBoundingClientRectX = target.getBoundingClientRect().x;
+    var targetBoundingClientRectY = target.getBoundingClientRect().y;
 
     var mydiv = document.createElement("div");
     mydiv.id = "newDivId";
@@ -81,7 +79,7 @@ function domBoom(target,onfinish) {
 
     var targetBak = target;
     target = target.cloneNode(true);
-    
+
     target.style.margin = "0";
     target.style.position = "absolute";
     target.style.top = targetBoundingClientRectY + "px";
@@ -91,41 +89,44 @@ function domBoom(target,onfinish) {
     mydiv.append(target);
     mydiv.style.filter = "opacity(0)";
     document.body.appendChild(mydiv);
-    
 
-    setTimeout(()=>html2canvas(mydiv, { backgroundColor: null }).then(function (
-        canvas
-    ) {
-        targetBak.style.filter = "opacity(0)";
-        mydiv.remove();
-        canvas.style.position = "absolute";
-        canvas.style.top = "0px";
-        canvas.style.left = "0px";
-        canvas.style.zIndex = "9999";
-        document.body.appendChild(canvas);
-        var boomOption2 = {
-        // 粒子间隔
-        gap: 10,
-        // 粒子大小
-        radius: 3,
-        // 最小水平喷射速度
-        minVx: -20,
-        // 最大水平喷射速度
-        maxVx: 25,
-        // 最小垂直喷射速度
-        minVy: -25,
-        // 最大垂直喷射速度
-        maxVy: 0.1,
-        // speed:2,
-        onBoomEnd: function () {
-            targetBak.remove(); 
-            // targetBak.style.filter = '';
-            if(onfinish)onfinish();
-            canvas.remove();
-        },
-    };
-        new ParticleBoom(canvas, boomOption2);
-    }),200);
+    setTimeout(
+        () =>
+            html2canvas(mydiv, { backgroundColor: null }).then(function (
+                canvas
+            ) {
+                targetBak.style.filter = "opacity(0)";
+                mydiv.remove();
+                canvas.style.position = "absolute";
+                canvas.style.top = "0px";
+                canvas.style.left = "0px";
+                canvas.style.zIndex = "9999";
+                document.body.appendChild(canvas);
+                var boomOption2 = {
+                    // 粒子间隔
+                    gap: 10,
+                    // 粒子大小
+                    radius: 3,
+                    // 最小水平喷射速度
+                    minVx: -20,
+                    // 最大水平喷射速度
+                    maxVx: 25,
+                    // 最小垂直喷射速度
+                    minVy: -25,
+                    // 最大垂直喷射速度
+                    maxVy: 0.1,
+                    // speed:2,
+                    onBoomEnd: function () {
+                        targetBak.remove();
+                        // targetBak.style.filter = '';
+                        if (onfinish) onfinish();
+                        canvas.remove();
+                    },
+                };
+                new ParticleBoom(canvas, boomOption2);
+            }),
+        200
+    );
 }
 
 var darkMode = false;
@@ -201,7 +202,9 @@ if (typeof require != "undefined") {
         data: {
             tab: "model",
             builtIn: builtInModels,
-            selectModel: localStorage.getItem('selectModel')?localStorage.getItem('selectModel'):JSON.stringify(builtInModels[0]),
+            selectModel: localStorage.getItem("selectModel")
+                ? localStorage.getItem("selectModel")
+                : JSON.stringify(builtInModels[0]),
             language: languages[globalSettings.ui.language],
             videoSource: "camera",
             videoPath: "",
@@ -275,12 +278,14 @@ if (typeof require != "undefined") {
                     app.language = languages[app.settings.ui.language];
                 },
                 deep: true,
-            },selectModel:{
+            },
+            selectModel: {
                 handler(newVal, oldVal) {
-                    localStorage.setItem('selectModel',app.selectModel)
-                },deep:true
-            }
-        }
+                    localStorage.setItem("selectModel", app.selectModel);
+                },
+                deep: true,
+            },
+        },
     });
 
     window.sysmocapApp = app;
@@ -428,9 +433,11 @@ if (typeof require != "undefined") {
                 document.getElementById("btnremove").style.display = "";
 
                 document.getElementById("btnremove").onclick = function () {
-                    var modelName = target.querySelector("h2").innerText
-                    domBoom(target)
-                    setTimeout(() => {removeUserModels(modelName);},1000)
+                    var modelName = target.querySelector("h2").innerText;
+                    domBoom(target);
+                    setTimeout(() => {
+                        removeUserModels(modelName);
+                    }, 1000);
                     rightclick.onclick();
                 };
 
@@ -787,13 +794,30 @@ window.startMocap = async function (e) {
         localStorage.setItem("modelInfo", app.selectModel);
         localStorage.setItem("useCamera", app.videoSource);
         localStorage.setItem("videoFile", app.videoPath[0]);
-        document.getElementById("foo").src = "../render/render.html";
-        e.innerHTML =
-            '<i class="mdui-icon material-icons">stop</i>' +
-            app.language.tabMocap.stop;
+        if (typeof require != "undefined") {
+            const win = remote.getCurrentWindow()
+            const bw = win.getBrowserView()
+            var winWidth = parseInt(win.getSize()[0])
+            bw.setBounds({ x: 20, y: 111, width:winWidth-40, height: parseInt((winWidth-40)*10/32+220) });
+            bw.webContents.loadFile("render/render.html");
+        } else {
+            
+            document.getElementById("foo").src = "../render/render.html";
+        }
+            e.innerHTML =
+                '<i class="mdui-icon material-icons">stop</i>' +
+                app.language.tabMocap.stop;
+        
     } else {
-        document.getElementById("foo").src = "about:blank";
         if (ipcRenderer) ipcRenderer.send("stopWebServer");
+        if (typeof require != "undefined") {
+            const win = remote.getCurrentWindow()
+            const bw = win.getBrowserView()
+            bw.setBounds({ x: 0, y: 0, width:0, height: 0 });
+            bw.webContents.loadURL("about:blank");
+        }else{
+        document.getElementById("foo").src = "about:blank";
+    }
         e.innerHTML =
             '<i class="mdui-icon material-icons">play_arrow</i>' +
             app.language.tabMocap.start;

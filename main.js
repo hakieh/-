@@ -142,7 +142,8 @@ if (argv.bsmode) {
     // Modules to control application life and create native browser window
 
     var blurBrowserWindow;
-    require("@electron/remote/main").initialize();
+    const electronRemoteMain = require("@electron/remote/main")
+    electronRemoteMain.initialize();
 
     // Enable Acrylic Effect on Windows by default
     if (platform === "win32")
@@ -169,6 +170,8 @@ if (argv.bsmode) {
     // Keep a global reference of the window object, if you don't, the window will
     // be closed automatically when the JavaScript object is garbage collected.
     let mainWindow;
+
+    var renderView;
 
     function createWindow() {
         // Create the browser window.
@@ -200,12 +203,21 @@ if (argv.bsmode) {
 
         // Open the DevTools.
         // mainWindow.webContents.openDevTools()
-        require("@electron/remote/main").enable(mainWindow.webContents);
+        electronRemoteMain.enable(mainWindow.webContents);
 
-        const view = new BrowserView();
-        mainWindow.setBrowserView(view);
-        view.setBounds({ x: 0, y: 0, width: 0, height: 0 });
-        view.webContents.loadURL("about:blank");
+        renderView = new BrowserView({webPreferences: {
+            nodeIntegration: true,
+            webviewTag: true,
+            contextIsolation: false,
+            enableRemoteModule: true,
+            backgroundThrottling: false,
+            nodeIntegrationInSubFrames: true,
+        }});
+        mainWindow.setBrowserView(renderView);
+        renderView.setBounds({ x: 0, y: 0, width: 0, height: 0 });
+        renderView.webContents.loadURL("about:blank");
+        renderView.webContents.openDevTools({ mode: 'detach' })
+        electronRemoteMain.enable( renderView.webContents);
 
         // Emitted when the window is closed.
         mainWindow.on("closed", function () {
@@ -248,7 +260,7 @@ if (argv.bsmode) {
 
         // and load the index.html of the app.
         viewer.loadFile("modelview/modelview.html");
-        require("@electron/remote/main").enable(viewer.webContents);
+        electronRemoteMain.enable(viewer.webContents);
 
         // Open the DevTools.
         // viewer.webContents.openDevTools()
@@ -283,7 +295,7 @@ if (argv.bsmode) {
 
         // and load the index.html of the app.
         viewer.loadFile("pdfviewer/viewer.html");
-        require("@electron/remote/main").enable(viewer.webContents);
+        electronRemoteMain.enable(viewer.webContents);
 
         // Open the DevTools.
         // viewer.webContents.openDevTools()
@@ -338,7 +350,7 @@ if (argv.bsmode) {
 
         // and load the html of the app.
         docWindow.loadFile("documentview/document.html");
-        require("@electron/remote/main").enable(docWindow.webContents);
+        electronRemoteMain.enable(docWindow.webContents);
 
         docWindow.on("closed", function () {
             docWindow = null;

@@ -9,7 +9,7 @@
  */
 
 // import setting utils
-const globalSettings = window.parent.window.sysmocapApp.settings;
+const { globalSettings } = require("../utils/setting.js");
 
 // set theme
 document.body.setAttribute(
@@ -115,8 +115,6 @@ animate();
 var modelObj = JSON.parse(localStorage.getItem("modelInfo"));
 var modelPath = modelObj.path;
 
-
-
 var fileType = modelPath
     .substring(modelPath.lastIndexOf(".") + 1)
     .toLowerCase();
@@ -142,7 +140,6 @@ light2.castShadow = true;
 scene.add(light2);
 
 var initRotation = {};
-
 
 // Import model from URL, add your own model here
 var loader = null;
@@ -205,14 +202,16 @@ loader.load(
                 );
                 orbitControls.update();
             }
-            if(modelObj.cameraPosition){
-                for (var i in modelObj.cameraPosition) orbitCamera.position[i] = modelObj.cameraPosition[i];
+            if (modelObj.cameraPosition) {
+                for (var i in modelObj.cameraPosition)
+                    orbitCamera.position[i] = modelObj.cameraPosition[i];
             }
-            if(modelObj.cameraRotation){
-                for (var i in modelObj.cameraRotation) orbitCamera.rotation[i] = modelObj.cameraRotation[i];
+            if (modelObj.cameraRotation) {
+                for (var i in modelObj.cameraRotation)
+                    orbitCamera.rotation[i] = modelObj.cameraRotation[i];
             }
 
-            if(modelObj.init){
+            if (modelObj.init) {
                 initRotation = modelObj.init;
             }
         }
@@ -252,7 +251,9 @@ const rigRotation = (
         Part.quaternion.slerp(quaternion, lerpAmount); // interpolate
     } else if (skeletonHelper) {
         var skname = modelObj.binding[name].name; // convert name with model json binding info
-        if(skname == "None"){return}
+        if (skname == "None") {
+            return;
+        }
         // find bone in bones by name
         var b = skeletonHelper.bones.find((bone) => bone.name == skname);
 
