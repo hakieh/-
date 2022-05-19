@@ -93,12 +93,16 @@ if (argv.bsmode) {
         res.redirect("/mainview/framework.html");
     });
 } else {
-    const { app,  BrowserView, BrowserWindow, ipcMain, nativeTheme } = require("electron");
+    const {
+        app,
+        BrowserView,
+        BrowserWindow,
+        ipcMain,
+        nativeTheme,
+    } = require("electron");
     const os = require("os");
     const platform = os.platform();
-    const { Worker} = require('worker_threads');
-    
-
+    const { Worker } = require("worker_threads");
 
     // Make profile file on user home dir
     const path = require("path");
@@ -198,10 +202,10 @@ if (argv.bsmode) {
         // mainWindow.webContents.openDevTools()
         require("@electron/remote/main").enable(mainWindow.webContents);
 
-        const view = new BrowserView()
-        mainWindow.setBrowserView(view)
-  view.setBounds({ x: 50, y: 50, width: 300, height: 300 })
-  view.webContents.loadURL('https://electronjs.org')
+        const view = new BrowserView();
+        mainWindow.setBrowserView(view);
+        view.setBounds({ x: 0, y: 0, width: 0, height: 0 });
+        view.webContents.loadURL("about:blank");
 
         // Emitted when the window is closed.
         mainWindow.on("closed", function () {
@@ -215,13 +219,13 @@ if (argv.bsmode) {
     function createModelViewerWindow(args) {
         // Create the browser window.
         var myBrowserWindow = BrowserWindow;
-        var addtionalArgs = {backgroundColor: "#eee"};
-        if(args.useGlass) {
+        var addtionalArgs = { backgroundColor: "#eee" };
+        if (args.useGlass) {
             myBrowserWindow = blurBrowserWindow;
-            addtionalArgs ={
-                vibrancy :  "light",
-                backgroundColor: "#00000000"
-            }
+            addtionalArgs = {
+                vibrancy: "light",
+                backgroundColor: "#00000000",
+            };
         }
         var viewer = new myBrowserWindow({
             width: 820,
@@ -241,7 +245,6 @@ if (argv.bsmode) {
                 additionalArguments: ["argsData", JSON.stringify(args)],
             },
         });
-
 
         // and load the index.html of the app.
         viewer.loadFile("modelview/modelview.html");
@@ -362,14 +365,14 @@ if (argv.bsmode) {
 
     ipcMain.on("startWebServer", function (event, ...arg) {
         const worker = new Worker(__dirname + "/webserv/worker.js");
-        worker.postMessage({type:"startWebServer", arg:arg});
+        worker.postMessage({ type: "startWebServer", arg: arg });
 
         ipcMain.on("sendBoradcast", function (event, arg) {
-            worker.postMessage({type:"sendBroadcast", arg:arg});
+            worker.postMessage({ type: "sendBroadcast", arg: arg });
         });
 
         ipcMain.on("stopWebServer", function (event, arg) {
-            worker.postMessage({type:"stopWebServer"});
+            worker.postMessage({ type: "stopWebServer" });
         });
     });
 
