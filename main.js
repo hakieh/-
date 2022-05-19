@@ -216,7 +216,7 @@ if (argv.bsmode) {
         mainWindow.setBrowserView(renderView);
         renderView.setBounds({ x: 0, y: 0, width: 0, height: 0 });
         renderView.webContents.loadURL("about:blank");
-        renderView.webContents.openDevTools({ mode: 'detach' })
+        // renderView.webContents.openDevTools({ mode: 'detach' })
         electronRemoteMain.enable( renderView.webContents);
 
         // Emitted when the window is closed.
